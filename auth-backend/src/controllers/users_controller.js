@@ -78,7 +78,7 @@ const loginUser = async (req, res, next) => {
 
   // if no match, return eror
 
-  // if user found, compare payload password with result from getByUsername
+  // if user found, compare payload password with result from getByUsername with bcrypt.js
 
   // if password is valid omit password from user response
 

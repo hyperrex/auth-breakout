@@ -4,15 +4,11 @@ const env = require('../../env')
 
 const authenticate = token => {
   try {
-    if (!token || isEmpty(token)) {
-      return { error: 'JWT required', status: 401 }
-    }
-    const verify = jwt.verify(token, env.JWT_KEY)
+    // if token is empty return { error: 'JWT required', status: 401 }
 
-    const { exp } = verify
-    if (exp * 1000 < Date.now()) {
-      return { error: 'JWT expired', status: 401 }
-    }
+    // verify token with jwt.verify and token secret from env
+
+    // if token is expired return { error: 'JWT expired', status: 401 }
 
     return true
   } catch (error) {
