@@ -74,56 +74,36 @@ const getUserByUsername = (req, res, next) => {
 }
 
 const loginUser = async (req, res, next) => {
-  let payload = req.body
-  // find user in database using username off of payload
-  let promise = await model.getUserByUsername(payload.username.toLowerCase())
+  // find user in database using username off of request body
 
-  if (promise.error) {
-    // if no match, return eror
-    next(promise)
+  // if no match, return eror
 
-    return
-  } else {
-    // if user found, compare payload password with result from getByUsername
-    const isValidPassword = await bcrypt.compare(
-      payload.password,
-      promise.hashedPassword
-    )
+  // if user found, compare payload password with result from getByUsername
 
-    if (isValidPassword) {
-      // if password is valid omit password from user body
-      delete promise.hashedPassword
-      // create JWT token
-      promise.isLoggedIn = true
-      const timeIssued = Math.floor(Date.now() / 1000)
-      const timeExpires = timeIssued + 86400 * 28
-      const token = await signJwt(
-        {
-          iss: 'thatSong',
-          aud: 'thatSong',
-          iat: timeIssued,
-          exp: timeExpires,
-          identity: promise.id
-        },
-        env.JWT_KEY
-      )
-      // once token is created find user's songs, followers and following
-      const songs = await getUserSongs(promise.id)
-      const followers = await getFollowers(promise.id)
-      const following = await getFollowing(promise.id)
-      // attach token, songs, followers, following to response body
-      promise.token = token
-      promise.userSongs = songs
-      promise.followers = followers
-      promise.following = following
+  // if password is valid omit password from user response
 
-      res.status(200).json(promise)
+  // create JWT token
 
-      return promise
-    } else {
-      next({ error: 'username or password not found', status: 404 })
-    }
-  }
+  const timeIssued = Math.floor(Date.now() / 1000)
+  const timeExpires = timeIssued + 86400 * 28
+  const token = await signJwt(
+    {
+      iss: 'thatSong',
+      aud: 'thatSong',
+      iat: timeIssued,
+      exp: timeExpires,
+      identity: 'something'
+    },
+    env.JWT_KEY
+  )
+
+  // attach token to response
+  // or attach token via headers (the correct way ;)
+
+  // respond with status 200 and user object
+  res.status(200).json(promise)
+
+  //respond with 404 and error message if not found
 
   promise.catch(error => {
     next(error)
